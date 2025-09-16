@@ -1,7 +1,7 @@
 services:
   immich-redis:
     image: redis
-    container_name: Immich-REDIS
+    container_name: immich-redis
     hostname: immich-redis
     security_opt:
       - no-new-privileges:true
@@ -14,10 +14,10 @@ services:
       - /volume2/docker/immich/redis:/data:rw
     restart: on-failure:5
 
-  immich-db:
+  immich-database:
     image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.2.0
-    container_name: Immich-DB
-    hostname: immich-db
+    container_name: immich-database
+    hostname: immich-database
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -48,12 +48,12 @@ services:
     ports:
       - 8212:2283
     volumes:
-      - /volume1/Photos:/data:rw
+      - /volume1/immich:/data:rw
     restart: on-failure:5
     depends_on:
       immich-redis:
         condition: service_healthy
-      immich-db:
+      immich-database:
         condition: service_started
 
   immich-machine-learning:
@@ -66,7 +66,7 @@ services:
     env_file:
       - stack.env
     volumes:
-      - /volume1/Photos:/data:rw
+      - /volume1/immich:/data:rw
       - /volume2/docker/immich/cache:/cache:rw
       - /volume2/docker/immich/cache:/.cache:rw
       - /volume2/docker/immich/cache:/.config:rw
@@ -75,5 +75,5 @@ services:
       - MPLCONFIGDIR=/matplotlib
     restart: on-failure:5
     depends_on:
-      immich-db:
+      immich-database:
         condition: service_started
